@@ -1,0 +1,31 @@
+buildscript {
+     ext.kotlin_version = '1.8.22' // Update this line to the needed version
+    repositories {
+        google()  // Make sure this line is included
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.0' // Ensure this matches your Gradle plugin version
+        classpath 'com.google.gms:google-services:4.4.1' // This is the dependency that's failing to resolve
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()  // Make sure this line is included
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

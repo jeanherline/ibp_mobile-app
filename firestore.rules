@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Notifications collection
+    // Allows read and write access only for authenticated users
+    match /notifications/{document} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Feedback collection
+    // Allows read and write access only for authenticated users
+    match /feedback/{document} {
+      allow read, write: if request.auth != null;
+    }
+
+    // FAQs collection
+    // Allows read access unconditionally and write access only for authenticated users
+    match /faqs/{document} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Articles collection
+    // Allows read access unconditionally and write access only for authenticated users
+    match /articles/{document} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Appointments collection
+    // Allows read and write access only for authenticated users, consider more restrictive rules based on user roles or document properties
+    match /appointments/{document} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Users collection
+    // Allows read access for authenticated users to their own data and write access if they are modifying their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Public documents
+    // Simplified to allow read for all users and write access only for authenticated users
+    match /{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
