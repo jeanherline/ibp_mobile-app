@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ibp_app_ver2/navbar.dart';
-import 'package:ibp_app_ver2/screens/Profile/edit_profile.dart'; // Import the navbar.dart file
+import 'package:ibp_app_ver2/qr_code_scanner_screen.dart';
+import 'package:ibp_app_ver2/screens/Profile/edit_profile.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
@@ -16,6 +16,7 @@ class _ProfileScreenState extends State<Profile> {
   String _displayName = '';
   String _email = '';
   String _city = '';
+  String _memberType = '';
 
   @override
   void initState() {
@@ -36,15 +37,14 @@ class _ProfileScreenState extends State<Profile> {
         String lastName = users['last_name'] ?? '';
         _displayName = '$firstName $middleName $lastName';
         _email = user.email ?? '';
-        _city = users['city'] ??
-            ''; // Make sure 'address' field exists in Firestore
+        _city = users['city'] ?? '';
+        _memberType = users['member_type'] ?? '';
       });
     }
   }
 
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
-    // ignore: use_build_context_synchronously
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
@@ -124,34 +124,18 @@ class _ProfileScreenState extends State<Profile> {
                       fontSize: 16,
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Daily Quotes:',
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 20), // Add space below the city
+                  if (_memberType == 'frontdesk')
+                    ProfileButton(
+                      icon: Icons.qr_code_scanner,
+                      label: 'Front Desk QR Scanner',
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => QRCodeScannerScreen()),
+                        );
+                      },
                     ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(40, 0, 40, 20),
-                    child: Text(
-                      'Ang hustisya ay hindi lang isang salita; ito ay isang pangako sa pagiging makatarungan, katotohanan, at ang proteksyon ng mga karapatan.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
                   ProfileButton(
                     icon: Icons.edit,
                     label: 'I-edit ang Profile',
