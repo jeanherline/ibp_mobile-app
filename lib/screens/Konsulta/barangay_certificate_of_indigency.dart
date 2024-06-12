@@ -22,6 +22,9 @@ class _BarangayCertificateOfIndigencyState
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(BuildContext context) async {
+    final formStateProvider =
+        Provider.of<FormStateProvider>(context, listen: false);
+
     if (kIsWeb) {
       html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
       uploadInput.accept = 'image/*';
@@ -34,22 +37,56 @@ class _BarangayCertificateOfIndigencyState
           reader.readAsDataUrl(files[0]);
           reader.onLoadEnd.listen((event) {
             final imageDataUrl = reader.result as String;
-            Provider.of<FormStateProvider>(context, listen: false)
+            formStateProvider
                 .setBarangaySelectedImage(NetworkImage(imageDataUrl));
           });
         }
       });
     } else {
-      final pickedFile = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxHeight: 300,
-        maxWidth: 300,
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('Gallery'),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    final pickedFile = await _picker.pickImage(
+                      source: ImageSource.gallery,
+                      maxHeight: 300,
+                      maxWidth: 300,
+                    );
+                    if (pickedFile != null) {
+                      formStateProvider.setBarangaySelectedImage(
+                          FileImage(File(pickedFile.path)));
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Camera'),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    final pickedFile = await _picker.pickImage(
+                      source: ImageSource.camera,
+                      maxHeight: 300,
+                      maxWidth: 300,
+                    );
+                    if (pickedFile != null) {
+                      formStateProvider.setBarangaySelectedImage(
+                          FileImage(File(pickedFile.path)));
+                    }
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       );
-
-      if (pickedFile != null) {
-        Provider.of<FormStateProvider>(context, listen: false)
-            .setBarangaySelectedImage(FileImage(File(pickedFile.path)));
-      }
     }
   }
 
@@ -165,7 +202,7 @@ class _BarangayCertificateOfIndigencyState
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotecta.',
+                            'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotekta.',
                             style: TextStyle(color: Colors.black),
                           ),
                         ),

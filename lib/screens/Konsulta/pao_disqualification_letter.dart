@@ -1,16 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
+import 'package:ibp_app_ver2/screens/Konsulta/konsulta_submit.dart';
 import 'package:provider/provider.dart';
-import 'form_state_provider.dart';
-import 'progress_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'dart:ui' as ui;
+import 'form_state_provider.dart';
+import 'progress_bar.dart';
 
 class PAODisqualificationLetter extends StatefulWidget {
   const PAODisqualificationLetter({super.key});
@@ -23,9 +27,12 @@ class PAODisqualificationLetter extends StatefulWidget {
 class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
-  bool _isChecked = false; // Added
+  bool _isChecked = false;
 
   Future<void> _pickImage(BuildContext context) async {
+    final formStateProvider =
+        Provider.of<FormStateProvider>(context, listen: false);
+
     if (kIsWeb) {
       html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
       uploadInput.accept = 'image/*';
@@ -38,8 +45,9 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
           reader.readAsDataUrl(files[0]);
           reader.onLoadEnd.listen((event) {
             final imageDataUrl = reader.result as String;
-            Provider.of<FormStateProvider>(context, listen: false)
-                .setPAOSelectedImage(NetworkImage(imageDataUrl));
+            if (mounted) {
+              formStateProvider.setPAOSelectedImage(NetworkImage(imageDataUrl));
+            }
           });
         }
       });
@@ -62,9 +70,10 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                       maxWidth: 300,
                     );
                     if (pickedFile != null) {
-                      Provider.of<FormStateProvider>(context, listen: false)
-                          .setPAOSelectedImage(
-                              FileImage(File(pickedFile.path)));
+                      if (mounted) {
+                        formStateProvider.setPAOSelectedImage(
+                            FileImage(File(pickedFile.path)));
+                      }
                     }
                   },
                 ),
@@ -79,9 +88,10 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                       maxWidth: 300,
                     );
                     if (pickedFile != null) {
-                      Provider.of<FormStateProvider>(context, listen: false)
-                          .setPAOSelectedImage(
-                              FileImage(File(pickedFile.path)));
+                      if (mounted) {
+                        formStateProvider.setPAOSelectedImage(
+                            FileImage(File(pickedFile.path)));
+                      }
                     }
                   },
                 ),
@@ -205,7 +215,7 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotecta.',
+                            'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotekta.',
                             style: TextStyle(color: Colors.black),
                           ),
                         ),
@@ -232,10 +242,10 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                           });
                         },
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'Naiintindihan ko ang mga katanungan at aking pinanunumpaan ang aking mga kasagutan at mga ibinigay na mga dokumento ay totoo at wasto.',
                               style: TextStyle(
@@ -299,7 +309,9 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                         await _saveFormData(context);
 
                         // Hide loading indicator
-                        Navigator.of(context).pop();
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
 
                         // Show success message and navigate to KonsultaSubmit
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -308,10 +320,14 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                           ),
                         );
 
-                        Navigator.pushNamed(
+                        Navigator.push(
                           context,
-                          '/konsulta_submit',
-                          arguments: formStateProvider.controlNumber,
+                          MaterialPageRoute(
+                            builder: (context) => KonsultaSubmit(
+                              controlNumber:
+                                  formStateProvider.controlNumber ?? '',
+                            ),
+                          ),
                         );
                       },
                       child: const Row(
@@ -344,7 +360,7 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -381,34 +397,41 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
       final controlNumber = generateControlNumber();
       formStateProvider.setControlNumber(controlNumber);
 
+      // Generate QR code image URL
+      final qrCodeImageUrl =
+          await _generateQrCodeImageUrl(controlNumber, storageRef);
+
       // Save form data to Firestore
       await userDoc.set({
-        'uid': user.uid,
-        'controlNumber': controlNumber,
-        'createdDate': FieldValue.serverTimestamp(),
-        'appointmentStatus': 'pending',
         'applicantProfile': {
-          'fullName': formStateProvider.fullName,
-          'dob': formStateProvider.dob,
+          'uid': user.uid,
           'address': formStateProvider.address,
+          'childrenNamesAges': formStateProvider.childrenNamesAges,
           'contactNumber': formStateProvider.contactNumber,
+          'dob': formStateProvider.dob,
+          'fullName': formStateProvider.fullName,
           'selectedGender': formStateProvider.selectedGender,
           'spouseName': formStateProvider.spouseName,
           'spouseOccupation': formStateProvider.spouseOccupation,
-          'childrenNamesAges': formStateProvider.childrenNamesAges,
         },
-        'employmentProfile': {
-          'occupation': formStateProvider.occupation,
-          'kindOfEmployment': formStateProvider.kindOfEmployment,
-          'employerName': formStateProvider.employerName,
-          'employerAddress': formStateProvider.employerAddress,
-          'monthlyIncome': formStateProvider.monthlyIncome,
+        'appointmentDetails': {
+          'appointmentStatus': 'pending',
+          'controlNumber': controlNumber,
+          'createdDate': FieldValue.serverTimestamp(),
+          'qrCode': qrCodeImageUrl,
         },
         'legalAssistanceRequested': {
-          'selectedAssistanceType': formStateProvider.selectedAssistanceType,
-          'problems': formStateProvider.problems,
-          'problemReason': formStateProvider.problemReason,
           'desiredSolutions': formStateProvider.desiredSolutions,
+          'problemReason': formStateProvider.problemReason,
+          'problems': formStateProvider.problems,
+          'selectedAssistanceType': formStateProvider.selectedAssistanceType,
+        },
+        'employmentProfile': {
+          'employerAddress': formStateProvider.employerAddress,
+          'employerName': formStateProvider.employerName,
+          'kindOfEmployment': formStateProvider.kindOfEmployment,
+          'monthlyIncome': formStateProvider.monthlyIncome,
+          'occupation': formStateProvider.occupation,
         },
         'uploadedImages': {
           'barangayImageUrl': barangayImageUrl,
@@ -445,6 +468,32 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
 
     final snapshot = await uploadTask;
     return await snapshot.ref.getDownloadURL();
+  }
+
+  Future<String> _generateQrCodeImageUrl(
+      String controlNumber, Reference storageRef) async {
+    final qrValidationResult = QrValidator.validate(
+      data: controlNumber,
+      version: QrVersions.auto,
+      errorCorrectionLevel: QrErrorCorrectLevel.L,
+    );
+    if (qrValidationResult.status == QrValidationStatus.valid) {
+      final qrCode = qrValidationResult.qrCode!;
+      final painter = QrPainter.withQr(
+        qr: qrCode,
+        color: const Color(0xFF000000), // QR color
+        gapless: false,
+      );
+      final image = await painter.toImage(200);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final buffer = byteData!.buffer.asUint8List();
+      final fileName = 'qr_code_$controlNumber.png';
+      final uploadTask = storageRef.child(fileName).putData(buffer);
+      final snapshot = await uploadTask;
+      return await snapshot.ref.getDownloadURL();
+    } else {
+      throw Exception('Failed to generate QR code');
+    }
   }
 
   String generateControlNumber() {

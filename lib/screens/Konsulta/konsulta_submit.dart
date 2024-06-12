@@ -1,23 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ibp_app_ver2/screens/home.dart';
+import 'package:provider/provider.dart';
+import 'form_state_provider.dart';
 
-class KonsultaSubmit extends StatelessWidget {
+class KonsultaSubmit extends StatefulWidget {
   final String controlNumber;
 
   const KonsultaSubmit({super.key, required this.controlNumber});
+
+  @override
+  _KonsultaSubmitState createState() => _KonsultaSubmitState();
+}
+
+class _KonsultaSubmitState extends State<KonsultaSubmit> {
+  Future<String?> _getQrCodeUrl(String controlNumber) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('appointments')
+        .where('appointmentDetails.controlNumber', isEqualTo: controlNumber)
+        .limit(1)
+        .get();
+
+    if (doc.docs.isNotEmpty) {
+      return doc.docs.first.data()['appointmentDetails']['qrCode'];
+    }
+    return null;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Provider.of<FormStateProvider>(context, listen: false).clearFormState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Home(),
-                  ),
-                )),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Provider.of<FormStateProvider>(context, listen: false).clearFormState();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Home(),
+              ),
+            );
+          },
+        ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -47,18 +78,57 @@ class KonsultaSubmit extends StatelessWidget {
               children: [
                 const SizedBox(height: 20),
                 const Center(
-                  child: Text(
-                    'Maraming Salamat! (Thank you very much!)',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Maraming Salamat!',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 8), // Add some space between the texts
+                      Text(
+                        '(Thank you very much!)',
+                        style: TextStyle(
+                          fontSize: 14, // Set the font size to 14
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'MUNTING PAALALA:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      SizedBox(width: 8), // Add some space between the texts
+                      Text(
+                        '(Reminder)',
+                        style: TextStyle(
+                          fontSize: 14, // Set the font size to 14
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 10),
                 const Center(
                   child: Text(
-                    'Mangyaring hintayin ang kumpirmasyon ng petsa at oras ng pagkonsulta nang personal. Huwag kalimutang dalhin ang mga hard copy ng mga dokumentong ipinasa online kung sakaling maaprubahan ang iyong appointment.',
+                    'Mangyaring hintayin ang kumpirmasyon ng petsa at oras ng inyong personal na pagkonsulta. Huwag kalimutang i-save ang QR Code at dalhin ang mga hard copy ng mga dokumentong ipinasa online sakaling maaprubahan ang inyong appointment.',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -69,7 +139,7 @@ class KonsultaSubmit extends StatelessWidget {
                 const SizedBox(height: 10),
                 const Center(
                   child: Text(
-                    '(Please wait for the confirmation of the date and time of the consultation in person. Do not forget to bring hard copies of the documents submitted online in case your appointment gets approved.)',
+                    '(Please wait for the confirmation of the date and time of your personal consultation. Do not forget to save the QR Code and bring hard copies of the documents submitted online in case your appointment is approved.)',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -80,7 +150,7 @@ class KonsultaSubmit extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 Container(
-                  padding: const EdgeInsets.all(50.0),
+                  padding: const EdgeInsets.all(30.0),
                   decoration: BoxDecoration(
                     color: Colors.blue[50],
                     borderRadius: BorderRadius.circular(10),
@@ -95,7 +165,7 @@ class KonsultaSubmit extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'TICKET #$controlNumber',
+                        'TICKET #${widget.controlNumber}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -109,6 +179,7 @@ class KonsultaSubmit extends StatelessWidget {
                           color: Colors.grey,
                           fontStyle: FontStyle.italic,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
                       const Text(
@@ -119,6 +190,34 @@ class KonsultaSubmit extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 20),
+                      FutureBuilder<String?>(
+                        future: _getQrCodeUrl(widget.controlNumber),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Center(
+                              child: Text('Error loading QR code.'),
+                            );
+                          } else if (snapshot.hasData) {
+                            final qrCodeUrl = snapshot.data;
+                            return qrCodeUrl != null
+                                ? Image.network(qrCodeUrl)
+                                : const Center(
+                                    child: Text('No QR code available.'),
+                                  );
+                          } else {
+                            return const Center(
+                              child: Text('No QR code available.'),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -136,7 +235,7 @@ class KonsultaSubmit extends StatelessWidget {
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotecta.',
+                          'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotekta.',
                           style: TextStyle(color: Colors.black),
                         ),
                       ),

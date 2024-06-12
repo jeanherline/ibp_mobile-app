@@ -22,6 +22,9 @@ class _DSWDCertificateOfIndigencyState
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(BuildContext context) async {
+    final formStateProvider =
+        Provider.of<FormStateProvider>(context, listen: false);
+
     if (kIsWeb) {
       html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
       uploadInput.accept = 'image/*';
@@ -34,8 +37,10 @@ class _DSWDCertificateOfIndigencyState
           reader.readAsDataUrl(files[0]);
           reader.onLoadEnd.listen((event) {
             final imageDataUrl = reader.result as String;
-            Provider.of<FormStateProvider>(context, listen: false)
-                .setDSWDSelectedImage(NetworkImage(imageDataUrl));
+            if (mounted) {
+              formStateProvider
+                  .setDSWDSelectedImage(NetworkImage(imageDataUrl));
+            }
           });
         }
       });
@@ -58,9 +63,11 @@ class _DSWDCertificateOfIndigencyState
                       maxWidth: 300,
                     );
                     if (pickedFile != null) {
-                      Provider.of<FormStateProvider>(context, listen: false)
-                          .setDSWDSelectedImage(
-                              FileImage(File(pickedFile.path)));
+                      print('Gallery image picked: ${pickedFile.path}');
+                      if (mounted) {
+                        formStateProvider.setDSWDSelectedImage(
+                            FileImage(File(pickedFile.path)));
+                      }
                     }
                   },
                 ),
@@ -75,9 +82,11 @@ class _DSWDCertificateOfIndigencyState
                       maxWidth: 300,
                     );
                     if (pickedFile != null) {
-                      Provider.of<FormStateProvider>(context, listen: false)
-                          .setDSWDSelectedImage(
-                              FileImage(File(pickedFile.path)));
+                      print('Camera image picked: ${pickedFile.path}');
+                      if (mounted) {
+                        formStateProvider.setDSWDSelectedImage(
+                            FileImage(File(pickedFile.path)));
+                      }
                     }
                   },
                 ),
@@ -201,7 +210,7 @@ class _DSWDCertificateOfIndigencyState
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotecta.',
+                            'Sineseryoso namin ang mga isyu sa privacy. Maaari kang makasiguro na ang iyong personal na data ay ligtas na nakaprotekta.',
                             style: TextStyle(color: Colors.black),
                           ),
                         ),

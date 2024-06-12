@@ -32,6 +32,8 @@ class FormStateProvider extends ChangeNotifier {
   // Control number field
   String controlNumber = '';
 
+  get qrCodeImageUrl => null;
+
   // Update methods for applicant profile
   void updateApplicantProfile({
     required String fullName,

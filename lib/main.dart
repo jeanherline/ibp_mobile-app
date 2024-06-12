@@ -64,9 +64,7 @@ class MyApp extends StatelessWidget {
         if (settings.name == '/konsulta_submit') {
           final args = settings.arguments as String;
           return MaterialPageRoute(
-            builder: (context) => KonsultaSubmit(
-              controlNumber: args,
-            ),
+            builder: (context) => KonsultaSubmit(controlNumber: args),
           );
         }
         assert(false, 'Need to implement ${settings.name}');
