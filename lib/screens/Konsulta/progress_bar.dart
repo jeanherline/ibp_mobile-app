@@ -25,7 +25,7 @@ class CustomProgressBar extends StatelessWidget {
             ),
             if (index != totalSteps - 1)
               Container(
-                width: 50,
+                width: 30,
                 height: 2,
                 color: isCompletedStep ? Colors.amber : Colors.grey[300],
               ),

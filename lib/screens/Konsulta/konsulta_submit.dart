@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ibp_app_ver2/screens/home.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import 'form_state_provider.dart';
 
 class KonsultaSubmit extends StatefulWidget {
@@ -14,6 +15,9 @@ class KonsultaSubmit extends StatefulWidget {
 }
 
 class _KonsultaSubmitState extends State<KonsultaSubmit> {
+  int _selectedRating = 0;
+  bool _isThankYouVisible = false;
+
   Future<String?> _getQrCodeUrl(String controlNumber) async {
     final doc = await FirebaseFirestore.instance
         .collection('appointments')
@@ -27,10 +31,101 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
     return null;
   }
 
+  Future<void> _submitRating() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('appointments')
+        .where('appointmentDetails.controlNumber',
+            isEqualTo: widget.controlNumber)
+        .limit(1)
+        .get();
+
+    if (doc.docs.isNotEmpty) {
+      final docId = doc.docs.first.id;
+      await FirebaseFirestore.instance
+          .collection('appointments')
+          .doc(docId)
+          .update({
+        'appointmentDetails.feedbackRating': _selectedRating,
+      });
+
+      Navigator.of(context).pop(); // Close the modal after rating
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Thank you for your feedback!'),
+        ),
+      );
+
+      // Clear form state after 10 seconds
+      Timer(Duration(seconds: 5), () {
+        Provider.of<FormStateProvider>(context, listen: false).clearFormState();
+      });
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
     Provider.of<FormStateProvider>(context, listen: false).clearFormState();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Show the feedback modal after 10 seconds
+    Timer(Duration(seconds: 10), () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => _buildFeedbackDialog(context),
+      );
+    });
+  }
+
+  Widget _buildFeedbackDialog(BuildContext context) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('I-rate ang karanasan'),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                  'Ang iyong puna ay makakatulong sa pagbuti ng pag-book ng appointment'),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      index < _selectedRating ? Icons.star : Icons.star_border,
+                    ),
+                    iconSize: 30,
+                    color: Colors.amber,
+                    onPressed: () {
+                      setState(() {
+                        _selectedRating = index + 1;
+                      });
+                      _submitRating();
+                    },
+                  );
+                }),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -40,7 +135,8 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Provider.of<FormStateProvider>(context, listen: false).clearFormState();
+            Provider.of<FormStateProvider>(context, listen: false)
+                .clearFormState();
             Navigator.push(
               context,
               MaterialPageRoute(
