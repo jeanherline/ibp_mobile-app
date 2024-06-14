@@ -59,11 +59,8 @@ class _DSWDCertificateOfIndigencyState
                     Navigator.of(context).pop();
                     final pickedFile = await _picker.pickImage(
                       source: ImageSource.gallery,
-                      maxHeight: 300,
-                      maxWidth: 300,
                     );
                     if (pickedFile != null) {
-                      print('Gallery image picked: ${pickedFile.path}');
                       if (mounted) {
                         formStateProvider.setDSWDSelectedImage(
                             FileImage(File(pickedFile.path)));
@@ -78,11 +75,8 @@ class _DSWDCertificateOfIndigencyState
                     Navigator.of(context).pop();
                     final pickedFile = await _picker.pickImage(
                       source: ImageSource.camera,
-                      maxHeight: 300,
-                      maxWidth: 300,
                     );
                     if (pickedFile != null) {
-                      print('Camera image picked: ${pickedFile.path}');
                       if (mounted) {
                         formStateProvider.setDSWDSelectedImage(
                             FileImage(File(pickedFile.path)));

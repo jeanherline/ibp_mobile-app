@@ -53,7 +53,7 @@ class _SignUpState extends State<SignUp> {
               'city': _selectedCity,
               'member_type': 'client',
               'user_status':
-                  'pending', // User status is set to pending initially
+                  'inactive', // User status is set to pending initially
               'created_time': DateTime.now(),
             });
 

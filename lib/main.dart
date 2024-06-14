@@ -16,6 +16,7 @@ import 'package:ibp_app_ver2/screens/Profile/profile.dart';
 import 'package:ibp_app_ver2/screens/Profile/edit_profile.dart';
 import 'package:ibp_app_ver2/screens/signup.dart';
 import 'package:ibp_app_ver2/screens/splash_screen.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

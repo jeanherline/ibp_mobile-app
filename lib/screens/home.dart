@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:ibp_app_ver2/navbar.dart';
+import 'package:flutter_tawk/flutter_tawk.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,6 +16,10 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final PageController _pageController = PageController(initialPage: 0);
   String _firstName = '';
+  String _displayName = '';
+  String _middleName = '';
+  String _lastName = '';
+  String _email = '';
 
   @override
   void initState() {
@@ -31,6 +36,10 @@ class _HomeState extends State<Home> {
           .get();
       setState(() {
         _firstName = users['display_name'];
+        _displayName = users['display_name'];
+        _middleName = users['middle_name'];
+        _lastName = users['last_name'];
+        _email = users['email'];
       });
     }
   }
@@ -151,7 +160,25 @@ class _HomeState extends State<Home> {
                               },
                             ),
                             _buildIconOption(
-                              icon: Icons.email_rounded,
+                              icon: FontAwesomeIcons.headset,
+                              label: 'Chat Support',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Tawk(
+                                      directChatLink: 'https://tawk.to/chat/666c61ce9a809f19fb3dc400/1i0bls3qi',
+                                      visitor: TawkVisitor(
+                                        name: '$_displayName $_middleName $_lastName',
+                                        email: _email,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            _buildIconOption(
+                              icon: Icons.question_answer,
                               label: 'FAQs',
                               onTap: () {
                                 print('FAQs pressed');

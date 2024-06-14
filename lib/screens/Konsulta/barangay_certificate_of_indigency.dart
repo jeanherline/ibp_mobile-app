@@ -57,8 +57,6 @@ class _BarangayCertificateOfIndigencyState
                     Navigator.of(context).pop();
                     final pickedFile = await _picker.pickImage(
                       source: ImageSource.gallery,
-                      maxHeight: 300,
-                      maxWidth: 300,
                     );
                     if (pickedFile != null) {
                       formStateProvider.setBarangaySelectedImage(
@@ -73,8 +71,6 @@ class _BarangayCertificateOfIndigencyState
                     Navigator.of(context).pop();
                     final pickedFile = await _picker.pickImage(
                       source: ImageSource.camera,
-                      maxHeight: 300,
-                      maxWidth: 300,
                     );
                     if (pickedFile != null) {
                       formStateProvider.setBarangaySelectedImage(
@@ -225,23 +221,25 @@ class _BarangayCertificateOfIndigencyState
                         backgroundColor: const Color(0xFF580049),
                       ),
                       onPressed: () {
-                        if (formStateProvider.barangaySelectedImage == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Please upload an image before proceeding.'),
+                        if (_formKey.currentState!.validate()) {
+                          if (formStateProvider.barangaySelectedImage == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Please upload an image before proceeding.'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const DSWDCertificateOfIndigency(),
                             ),
                           );
-                          return;
                         }
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const DSWDCertificateOfIndigency(),
-                          ),
-                        );
                       },
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,

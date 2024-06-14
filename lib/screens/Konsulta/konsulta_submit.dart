@@ -64,6 +64,12 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    Provider.of<FormStateProvider>(context, listen: false).clearFormState();
+  }
+
+  @override
   void initState() {
     super.initState();
     // Show the feedback modal after 10 seconds

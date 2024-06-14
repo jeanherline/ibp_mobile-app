@@ -66,8 +66,6 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                     Navigator.of(context).pop();
                     final pickedFile = await _picker.pickImage(
                       source: ImageSource.gallery,
-                      maxHeight: 300,
-                      maxWidth: 300,
                     );
                     if (pickedFile != null) {
                       if (mounted) {
@@ -84,8 +82,6 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
                     Navigator.of(context).pop();
                     final pickedFile = await _picker.pickImage(
                       source: ImageSource.camera,
-                      maxHeight: 300,
-                      maxWidth: 300,
                     );
                     if (pickedFile != null) {
                       if (mounted) {
