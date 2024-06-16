@@ -45,14 +45,14 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
           .collection('appointments')
           .doc(docId)
           .update({
-        'appointmentDetails.feedbackRating': _selectedRating,
+        'appointmentDetails.rating': _selectedRating,
       });
 
       Navigator.of(context).pop(); // Close the modal after rating
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Thank you for your feedback!'),
+          content: Text('Thank you for your rating!'),
         ),
       );
 
@@ -72,16 +72,16 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
   @override
   void initState() {
     super.initState();
-    // Show the feedback modal after 10 seconds
+    // Show the rating modal after 10 seconds
     Timer(Duration(seconds: 10), () {
       showDialog(
         context: context,
-        builder: (BuildContext context) => _buildFeedbackDialog(context),
+        builder: (BuildContext context) => _buildRatingDialog(context),
       );
     });
   }
 
-  Widget _buildFeedbackDialog(BuildContext context) {
+  Widget _buildRatingDialog(BuildContext context) {
     return StatefulBuilder(
       builder: (context, setState) {
         return AlertDialog(

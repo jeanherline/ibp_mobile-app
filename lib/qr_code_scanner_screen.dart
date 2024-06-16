@@ -75,7 +75,7 @@ class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
                                 ),
                                 Text(
                                   'Full Name: ${appointmentDetails!['fullName']}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
@@ -91,7 +91,7 @@ class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
                                 ),
                                 Text(
                                   'Reviewed By: $reviewedByName',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
@@ -100,7 +100,7 @@ class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
                             ),
                           )
                         : CircularProgressIndicator()
-                    : Text(
+                    : const Text(
                         'Scan a code',
                         style: TextStyle(
                           fontSize: 18,
