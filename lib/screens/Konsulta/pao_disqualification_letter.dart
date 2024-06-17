@@ -413,6 +413,7 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
         'appointmentDetails': {
           'appointmentStatus': 'pending',
           'controlNumber': controlNumber,
+          'apptType': 'Online',
           'createdDate': FieldValue.serverTimestamp(),
           'qrCode': qrCodeImageUrl,
         },
