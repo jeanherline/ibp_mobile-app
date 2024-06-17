@@ -51,30 +51,13 @@ class _HomeState extends State<Home> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Disclaimer'),
-          content: SingleChildScrollView(
+          content: const SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
+              children: <Widget>[
                 Text(
+                  'Thank you for using our app, Integrated Bar of the Philippines Electronic Legal Services and Access Malolos Chapter (IBP - ELSA Malolos), which serves as an online appointment booking system for IBP Malolos. Additionally, our app offers web viewing of Jur.ph, an AI-Powered Legal Research Platform in the Philippines. By incorporating Jur.ph into our app, we aim to provide a valuable public service that significantly benefits our users by granting access to essential legal information and resources.\n\n'
                   'Our app, IBP - ELSA Malolos, is independent of Jur.ph. Jur.ph retains sole ownership of their content, and our app maintains a separate identity. By including their website, we aim to offer essential legal information and resources as a public service.\n\n'
-                  'Thank you for accessing or using our app, Integrated Bar of the Philippines Electronic Legal Services and Access Malolos Chapter (IBP - ELSA Malolos), which serves as an appointment booking system for IBP Malolos. Additionally, our app offers web viewing of Jur.ph, an AI-Powered Legal Research Platform in the Philippines. By incorporating Jur.ph into our app, we aim to provide a valuable public service that significantly benefits our users by granting access to essential legal information and resources.\n\n'
-                  'Please take the time to read the contents herein for your information and awareness as they are part of the terms and conditions for your access, use, or continued access/use of the Service.\n\n'
-                  '1) Legal Disclaimer\n'
-                  'All information is for educational purposes and general information only. These should not be taken as professional legal advice or opinion. No lawyer-client relationship is intended. Please consult a competent lawyer to address your specific concerns. The statements or opinions of the author are his own and do not reflect that of any organization he may be connected to.\n\n'
-                  'a. No legal advice is given\n\n'
-                  'No professional nor legal advice/opinion is given in any of our Content.\n\n'
-                  'The Content is intended to be a resource or reference materials for learning about Philippine laws. They are neither intended nor considered to be professional nor legal advice, particularly for questions that may be answered. The answering of questions is for the purpose of education, illustration, or for general additional information.\n\n'
-                  'If you have legal questions (a) which may require attention to protect your rights and interests, as well as protect you from lawsuits or liabilities, or (b) which may affect your rights or obligations, it is strongly recommended that you consult competent lawyers. Before giving you appropriate legal advice which may be unique to your circumstances, competent lawyers are trained to first ask you a series of questions, review all available pieces of evidence such as documentary or object evidence, and carefully analyze your case or situation. These are obviously neither observed, available, nor contemplated in making our Content.\n\n'
-                  'b. No lawyer-client relationship is intended\n\n'
-                  'Similarly, in the process of asking submitted questions, there is no lawyer-client relationship that is being created nor intended to be created. For the avoidance of doubt and clarity, no lawyer-client relationship is contemplated in answering questions. The intent and purpose of answering questions is for educational purposes and general information only. The questions provide for a good opportunity to further elaborate on certain topics or be a springboard for discussions, particularly on whether a law may or may not apply in given hypothetical circumstances or situations.\n\n'
-                  'c. Individual statements\n\n'
-                  'In all their Content, the statements or comments of the authors or speakers are solely their own. Their statements or comments do not reflect our views nor those of this Service, nor of any organization which they may belong to or be associated with.\n\n'
-                  '2) Content Disclaimer\n'
-                  'While we strive for accuracy and reliability, we do not make any claims, representations, or warranties that their Content is fully and completely accurate at any given time. It is because the nature of the law is such that it continues to grow and develop via new legislation, regulations, or jurisprudence, and in the course thereof, there may appear conflicts, including previous ones which remain unresolved.\n\n'
-                  'Thus, our users are strongly advised to verify and research independently on their own to be updated with current legislation, regulations, or jurisprudence. Our Content may serve as a starting point for your research to see if there have been developments since its publication or posting date.\n\n'
-                  '3) Distinct Identity and Branding\n'
-                  'Our app, Integrated Bar of the Philippines Electronic Legal Services and Access Malolos Chapter (IBP - ELSA Malolos), is not directly affiliated with Jur.ph. All content from Jur.ph is solely theirs, and we have no involvement in their website content. We maintain the distinct identity and branding of both our application and Jur.ph. By incorporating their website into our app, we aim to offer a valuable public service that will significantly benefit our users by providing access to essential legal information and resources.\n\n'
-                  '4) Specific Objective\n'
-                  'By incorporating/web viewing Jur.ph into our app, we aim to:\n\n'
+                  'By incorporating Jur.ph into our app, we aim to:\n\n'
                   'Offer a valuable public service that will significantly benefit our users by providing them with access to essential legal information and resources, including curated laws and jurisprudence in the Philippines.\n\n',
                 ),
               ],
