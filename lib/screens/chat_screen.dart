@@ -25,7 +25,7 @@ class ChatScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Live Chat for Inquries'),
+        title: const Text('Chat for Inquries'),
       ),
       body: Tawk(
         directChatLink:
