@@ -51,11 +51,20 @@ class _ProfileScreenState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8EAED),
+      backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE8EAED),
+        backgroundColor: const Color(0xFFFFFFFF),
         automaticallyImplyLeading: false,
         elevation: 0,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            color: Color(0xFF580049),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: SafeArea(
         top: true,
@@ -65,23 +74,6 @@ class _ProfileScreenState extends State<Profile> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                    child: const Row(
-                      children: [
-                        Text(
-                          'Profile',
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            color: Color(0xFF580049),
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 30),
                     child: Row(
@@ -125,6 +117,20 @@ class _ProfileScreenState extends State<Profile> {
                     ),
                   ),
                   const SizedBox(height: 20), // Add space below the city
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    color: Colors.grey[200],
+                    child: const Text(
+                      'Daily Quotes:\nAng hustisya ay hindi lang isang salita; ito ay isang pangako sa pagiging makatarungan, katotohanan, at ang proteksyon ng mga karapatan.',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   if (_memberType == 'frontdesk')
                     ProfileButton(
                       icon: Icons.qr_code_scanner,
@@ -166,7 +172,7 @@ class _ProfileScreenState extends State<Profile> {
                     onPressed: _signOut,
                   ),
                   const SizedBox(
-                      height: 50), // Add some space above the navigation bar
+                      height: 90), // Add some space above the navigation bar
                 ],
               ),
             ),
