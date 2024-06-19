@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUp(),
         '/home': (context) => const Home(),
         '/profile': (context) => const Profile(),
-        '/edit_profile': (context) => const EditProfile(),
+        '/edit_profile': (context) => EditProfile(),
         '/applicant_profile': (context) => const ApplicantProfile(),
         '/employment_profile': (context) => const EmploymentProfile(),
         '/nature_of_legal_assistance_requested': (context) =>

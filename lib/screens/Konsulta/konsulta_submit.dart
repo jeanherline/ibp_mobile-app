@@ -38,14 +38,14 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
             isEqualTo: widget.controlNumber)
         .limit(1)
         .get();
-// 
+//
     if (doc.docs.isNotEmpty) {
       final docId = doc.docs.first.id;
       await FirebaseFirestore.instance
           .collection('appointments')
           .doc(docId)
           .update({
-        'appointmentDetails.rating': _selectedRating,
+        'appointmentDetails.aptRating': _selectedRating,
       });
 
       Navigator.of(context).pop(); // Close the modal after rating

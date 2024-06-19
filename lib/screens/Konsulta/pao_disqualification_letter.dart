@@ -478,7 +478,10 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
       final qrCode = qrValidationResult.qrCode!;
       final painter = QrPainter.withQr(
         qr: qrCode,
+        // ignore: deprecated_member_use
         color: const Color(0xFF000000), // QR color
+        // ignore: deprecated_member_use
+        emptyColor: Colors.blue[50], // Background color
         gapless: false,
       );
       final image = await painter.toImage(200);
