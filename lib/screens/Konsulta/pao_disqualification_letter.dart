@@ -370,15 +370,21 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
     final formStateProvider = context.read<FormStateProvider>();
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      final userDoc =
-          FirebaseFirestore.instance.collection('appointments').doc();
-      final now = DateTime.now();
-      final String datetime = DateFormat('yyyyMMdd_HHmmss').format(now);
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('konsulta_user_uploads/${user.uid}/$datetime');
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User is not authenticated')),
+      );
+      return;
+    }
 
+    final userDoc = FirebaseFirestore.instance.collection('appointments').doc();
+    final now = DateTime.now();
+    final String datetime = DateFormat('yyyyMMdd_HHmmss').format(now);
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('konsulta_user_uploads/${user.uid}/$datetime');
+
+    try {
       // Upload images to Firebase Storage
       final barangayImageUrl = await _uploadImage(
           storageRef,
@@ -436,6 +442,35 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
           'paoImageUrl': paoImageUrl,
         },
       });
+
+      // Hide loading indicator
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Show success message and navigate to KonsultaSubmit
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Form submitted successfully'),
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => KonsultaSubmit(
+            controlNumber: formStateProvider.controlNumber ?? '',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit form: $e')),
+      );
     }
   }
 
