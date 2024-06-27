@@ -26,7 +26,9 @@ class _ApplicantProfileState extends State<ApplicantProfile> {
       TextEditingController();
   final TextEditingController _childrenNamesAgesController =
       TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
   String? _selectedGender;
+  String? _selectedCity;
 
   @override
   void initState() {
@@ -44,9 +46,14 @@ class _ApplicantProfileState extends State<ApplicantProfile> {
       if (userData.exists) {
         print("User data fetched: ${userData.data()}");
         setState(() {
-          _fullNameController.text =
-              '${userData['display_name'] ?? ''} ${userData['middle_name'] ?? ''} ${userData['last_name'] ?? ''}'
-                  .trim();
+          String displayName = userData['display_name'] ?? '';
+          String middleName = userData['middle_name'] ?? '';
+          String lastName = userData['last_name'] ?? '';
+
+          _fullNameController.text = middleName.isNotEmpty
+              ? '$displayName $middleName $lastName'.trim()
+              : '$displayName $lastName'.trim();
+
           // Convert Timestamp to Date String
           if (userData['dob'] != null) {
             Timestamp dobTimestamp = userData['dob'];
@@ -61,6 +68,7 @@ class _ApplicantProfileState extends State<ApplicantProfile> {
           _spouseNameController.text = userData['spouse'] ?? '';
           _spouseOccupationController.text = userData['spouseOccupation'] ?? '';
           _addressController.text = userData['city'] ?? '';
+          _selectedCity = userData['city'] ?? '';
         });
       } else {
         print("No user data found for UID: ${user.uid}");
@@ -120,58 +128,68 @@ class _ApplicantProfileState extends State<ApplicantProfile> {
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                      'Buong Pangalan',
-                      'Full Name',
-                      _fullNameController,
-                      'Ilagay ang buong pangalan (Enter full name)',
-                      true),
+                    'Buong Pangalan',
+                    'Full Name',
+                    _fullNameController,
+                    'Ilagay ang buong pangalan (Enter full name)',
+                    true,
+                  ),
                   const SizedBox(height: 20),
                   _buildDateField(
-                      'Araw ng Kapanganakan',
-                      'Date of Birth',
-                      _dobController,
-                      'Ilagay ang araw ng kapanganakan (Enter date of birth)',
-                      true),
+                    'Araw ng Kapanganakan',
+                    'Date of Birth',
+                    _dobController,
+                    'Ilagay ang araw ng kapanganakan (Enter date of birth)',
+                    true,
+                  ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                      'Adres o Tinitirahan',
-                      'Address',
-                      _addressController,
-                      'Ilagay ang adres o tinitirahan (Enter full address)',
-                      true),
+                    'Adres o Tinitirahan',
+                    'Street Address',
+                    _addressController,
+                    'Ilagay ang adres o tinitirahan (Enter full address)',
+                    true,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildCityDropdownField(),
                   const SizedBox(height: 20),
                   _buildNumberField(
-                      'Numero ng Telepono',
-                      'Contact Number',
-                      _contactNumberController,
-                      'Ilagay ang numero ng telepono (Enter contact number)',
-                      true),
+                    'Numero ng Telepono',
+                    'Contact Number',
+                    _contactNumberController,
+                    'Ilagay ang numero ng telepono (Enter contact number)',
+                    true,
+                  ),
                   const SizedBox(height: 20),
                   _buildDropdownField(
-                      'Kasarian',
-                      'Gender',
-                      ['Male', 'Female', 'Other'],
-                      _selectedGender,
-                      'Piliin ang kasarian (Choose gender)',
-                      true, (value) {
-                    setState(() {
-                      _selectedGender = value;
-                    });
-                  }),
+                    'Kasarian',
+                    'Gender',
+                    ['Male', 'Female', 'Other'],
+                    _selectedGender,
+                    'Piliin ang kasarian (Choose gender)',
+                    true,
+                    (value) {
+                      setState(() {
+                        _selectedGender = value;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                      'Pangalan ng Asawa',
-                      'Name of Spouse',
-                      _spouseNameController,
-                      'Ilagay ang pangalan ng asawa (Enter spouse’s name)',
-                      false),
+                    'Pangalan ng Asawa',
+                    'Name of Spouse',
+                    _spouseNameController,
+                    'Ilagay ang pangalan ng asawa (Enter spouse’s name)',
+                    false,
+                  ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                      'Trabaho ng Asawa',
-                      'Occupation of Spouse',
-                      _spouseOccupationController,
-                      'Ilagay ang trabaho ng asawa (Enter spouse’s occupation)',
-                      false),
+                    'Trabaho ng Asawa',
+                    'Occupation of Spouse',
+                    _spouseOccupationController,
+                    'Ilagay ang trabaho ng asawa (Enter spouse’s occupation)',
+                    false,
+                  ),
                   const SizedBox(height: 20),
                   _buildTextAreaField(
                     'Kung kasal, ilagay ang pangalan ng mga anak at edad nila',
@@ -195,6 +213,7 @@ class _ApplicantProfileState extends State<ApplicantProfile> {
                             fullName: _fullNameController.text,
                             dob: _dobController.text,
                             address: _addressController.text,
+                            city: _selectedCity ?? '',
                             contactNumber: _contactNumberController.text,
                             selectedGender: _selectedGender ?? '',
                             spouseName: _spouseNameController.text,
@@ -534,6 +553,46 @@ class _ApplicantProfileState extends State<ApplicantProfile> {
               : null,
         ),
       ],
+    );
+  }
+
+  Widget _buildCityDropdownField() {
+    const List<String> cities = [
+      'Angat',
+      'Balagtas',
+      'Baliuag',
+      'Bocaue',
+      'Bulakan',
+      'Bustos',
+      'Calumpit',
+      'Doña Remedios Trinidad',
+      'Guiguinto',
+      'Hagonoy',
+      'Marilao',
+      'Norzagaray',
+      'Obando',
+      'Pandi',
+      'Paombong',
+      'Plaridel',
+      'Pulilan',
+      'San Ildefonso',
+      'San Miguel',
+      'San Rafael',
+      'Santa Maria',
+    ];
+
+    return _buildDropdownField(
+      'Lungsod / Munisipalidad',
+      'City / Municipality',
+      cities,
+      _selectedCity,
+      'Piliin ang lungsod / munisipalidad (Choose city/municipality)',
+      true,
+      (value) {
+        setState(() {
+          _selectedCity = value;
+        });
+      },
     );
   }
 }

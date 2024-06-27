@@ -115,7 +115,6 @@ class _ProfileScreenState extends State<Profile> {
             fontFamily: 'Roboto',
             color: Colors.white,
             fontSize: 24,
-            fontWeight: FontWeight.bold,
           ),
         ),
       ),

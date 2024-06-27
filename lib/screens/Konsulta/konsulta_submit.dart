@@ -15,9 +15,6 @@ class KonsultaSubmit extends StatefulWidget {
 }
 
 class _KonsultaSubmitState extends State<KonsultaSubmit> {
-  int _selectedRating = 0;
-  bool _isThankYouVisible = false;
-
   Future<String?> _getQrCodeUrl(String controlNumber) async {
     final doc = await FirebaseFirestore.instance
         .collection('appointments')
@@ -31,101 +28,10 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
     return null;
   }
 
-  Future<void> _submitRating() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('appointments')
-        .where('appointmentDetails.controlNumber',
-            isEqualTo: widget.controlNumber)
-        .limit(1)
-        .get();
-//
-    if (doc.docs.isNotEmpty) {
-      final docId = doc.docs.first.id;
-      await FirebaseFirestore.instance
-          .collection('appointments')
-          .doc(docId)
-          .update({
-        'appointmentDetails.aptRating': _selectedRating,
-      });
-
-      Navigator.of(context).pop(); // Close the modal after rating
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Thank you for your rating!'),
-        ),
-      );
-
-      // Clear form state after 10 seconds
-      Timer(Duration(seconds: 5), () {
-        Provider.of<FormStateProvider>(context, listen: false).clearFormState();
-      });
-    }
-  }
-
   @override
   void dispose() {
     super.dispose();
     Provider.of<FormStateProvider>(context, listen: false).clearFormState();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Show the rating modal after 10 seconds
-    Timer(Duration(seconds: 10), () {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => _buildRatingDialog(context),
-      );
-    });
-  }
-
-  Widget _buildRatingDialog(BuildContext context) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('I-rate ang karanasan'),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                  'Ang iyong puna ay makakatulong sa pagbuti ng pag-book ng appointment'),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      index < _selectedRating ? Icons.star : Icons.star_border,
-                    ),
-                    iconSize: 30,
-                    color: Colors.amber,
-                    onPressed: () {
-                      setState(() {
-                        _selectedRating = index + 1;
-                      });
-                      _submitRating();
-                    },
-                  );
-                }),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -235,7 +141,7 @@ class _KonsultaSubmitState extends State<KonsultaSubmit> {
                 const SizedBox(height: 10),
                 const Center(
                   child: Text(
-                    '(Please wait for the confirmation of the date and time of your personal consultation. Do not forget to save the QR Code and bring hard copies of the documents submitted online in case your appointment is approved.)',
+                    '(Please wait for the confirmation of the date and time of consultation. Do not forget to save the QR Code and bring hard copies of the documents submitted online in case your appointment is approved.)',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,

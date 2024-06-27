@@ -5,6 +5,7 @@ class FormStateProvider extends ChangeNotifier {
   String fullName = '';
   String dob = '';
   String address = '';
+  String city = ''; // Added city field
   String contactNumber = '';
   String selectedGender = '';
   String spouseName = '';
@@ -39,6 +40,7 @@ class FormStateProvider extends ChangeNotifier {
     required String fullName,
     required String dob,
     required String address,
+    required String city, // Added city parameter
     required String contactNumber,
     required String selectedGender,
     required String spouseName,
@@ -48,6 +50,7 @@ class FormStateProvider extends ChangeNotifier {
     this.fullName = fullName;
     this.dob = dob;
     this.address = address;
+    this.city = city; // Added city field
     this.contactNumber = contactNumber;
     this.selectedGender = selectedGender;
     this.spouseName = spouseName;
@@ -115,6 +118,7 @@ class FormStateProvider extends ChangeNotifier {
     fullName = '';
     dob = '';
     address = '';
+    city = ''; // Clear city field
     contactNumber = '';
     selectedGender = '';
     spouseName = '';

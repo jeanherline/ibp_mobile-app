@@ -377,7 +377,13 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
       return;
     }
 
-    final userDoc = FirebaseFirestore.instance.collection('appointments').doc();
+    // Generate control number
+    final controlNumber = generateControlNumber();
+    formStateProvider.setControlNumber(controlNumber);
+
+    final userDoc = FirebaseFirestore.instance
+        .collection('appointments')
+        .doc(controlNumber);
     final now = DateTime.now();
     final String datetime = DateFormat('yyyyMMdd_HHmmss').format(now);
     final storageRef = FirebaseStorage.instance
@@ -395,10 +401,6 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
       final paoImageUrl = await _uploadImage(storageRef,
           'paoDisqualificationLetter', formStateProvider.paoSelectedImage);
 
-      // Generate control number
-      final controlNumber = generateControlNumber();
-      formStateProvider.setControlNumber(controlNumber);
-
       // Generate QR code image URL
       final qrCodeImageUrl =
           await _generateQrCodeImageUrl(controlNumber, storageRef);
@@ -408,6 +410,7 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
         'applicantProfile': {
           'uid': user.uid,
           'address': formStateProvider.address,
+          'city': formStateProvider.city,
           'childrenNamesAges': formStateProvider.childrenNamesAges,
           'contactNumber': formStateProvider.contactNumber,
           'dob': formStateProvider.dob,
@@ -421,6 +424,8 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
           'controlNumber': controlNumber,
           'apptType': 'Online',
           'createdDate': FieldValue.serverTimestamp(),
+          'updatedTime': FieldValue.serverTimestamp(),
+          'read': 'false',
           'qrCode': qrCodeImageUrl,
         },
         'legalAssistanceRequested': {
@@ -442,6 +447,29 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
           'paoImageUrl': paoImageUrl,
         },
       });
+
+      // Notify the current user
+      await _sendNotification(
+        uid: user.uid,
+        message:
+            'Your appointment request with Ticket Number $controlNumber has been submitted successfully. Please wait for the confirmation of the date and time of consultation.',
+        type: 'appointment',
+      );
+
+      // Notify head lawyers
+      final headLawyersSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('member_type', isEqualTo: 'head')
+          .get();
+
+      for (final doc in headLawyersSnapshot.docs) {
+        await _sendNotification(
+          uid: doc.id,
+          message:
+              'A new appointment request has been submitted by ${formStateProvider.fullName} with Ticket Number $controlNumber and is awaiting your approval.',
+          type: 'appointment',
+        );
+      }
 
       // Hide loading indicator
       if (mounted) {
@@ -472,6 +500,25 @@ class _PAODisqualificationLetterState extends State<PAODisqualificationLetter> {
         SnackBar(content: Text('Failed to submit form: $e')),
       );
     }
+  }
+
+  Future<void> _sendNotification({
+    String? uid,
+    String? memberType,
+    required String message,
+    required String type,
+  }) async {
+    final notificationDoc =
+        FirebaseFirestore.instance.collection('notifications').doc();
+    await notificationDoc.set({
+      'notifId': notificationDoc.id,
+      'uid': uid,
+      'member_type': memberType,
+      'message': message,
+      'type': type,
+      'read': false,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 
   Future<String?> _uploadImage(

@@ -47,5 +47,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/videos/ibp_splash_screen.mp4 # Video asset declared here
+    - assets/videos/ibp_splash_screen.mp4
+    - assets/img/ibp_logo.png
+
 

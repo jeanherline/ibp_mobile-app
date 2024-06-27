@@ -21,6 +21,7 @@ class _HomeState extends State<Home> {
   String _middleName = '';
   String _lastName = '';
   String _email = '';
+  String _userQrCode = '';
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class _HomeState extends State<Home> {
         _middleName = users['middle_name'];
         _lastName = users['last_name'];
         _email = users['email'];
+        _userQrCode = users['userQrCode'];
       });
     }
   }
@@ -82,6 +84,88 @@ class _HomeState extends State<Home> {
     );
   }
 
+  void _showQrCodeModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(8.0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: _userQrCode.isNotEmpty
+                      ? Image.network(_userQrCode)
+                      : const Text('No QR code available.'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showIBPLogoModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(8.0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              const Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'Integrated Bar of the Philippines',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Gat Marcelo H. del Pilar (Bulacan Chapter)',
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: 16.0, right: 16.0, bottom: 16.0),
+                      child: Text(
+                        'IBP Building, Provincial Capitol Compound,\nMalolos City, Bulacan\n\nTel. No: (044) 662 4786\nCel. No:+63 917 168 9873\nEmail: ibpbulacanchapter@gmail.com',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,6 +174,36 @@ class _HomeState extends State<Home> {
         backgroundColor: const Color(0xFF580049),
         automaticallyImplyLeading: false,
         elevation: 0,
+        leadingWidth: 150,
+        leading: GestureDetector(
+          onTap: () {
+            _showQrCodeModal(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                const Icon(Icons.qr_code, color: Colors.white),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: const Text(
+                    'Personal QR',
+                    style: TextStyle(color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Image.asset('assets/img/ibp_logo.png'),
+            onPressed: () {
+              _showIBPLogoModal(context);
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Stack(
@@ -124,7 +238,7 @@ class _HomeState extends State<Home> {
                           title:
                               '|  Mag-book ng appointment para sa Legal Aid:',
                           description:
-                              'Mag-book ng inyong mga appointment online gamit ang aming bagong scheduling module! Pinadadali nito ang proseso sa pamamagitan ng pagbibigay ng malinaw na impormasyon tungkol sa mga kinakailangan, available na oras, at iskedyul.',
+                              'Mag-book ng inyong mga appointment online gamit ang aming bagong scheduling module! Pinadadali nito ang proseso sa pamamagitan ng pagbibigay ng malinaw na impormasyon tungkol sa mga kinakailangan.',
                           color: const Color(0xFF221F1F),
                         ),
                         _buildPageItem(
@@ -137,7 +251,7 @@ class _HomeState extends State<Home> {
                           title: '|  Palawakin ang kaalaman gamit ang Jur.ph:',
                           description:
                               'Gamitin ang Jur.ph sa aming IBP ELSA app! Makakakuha kayo ng access sa mahahalagang legal na impormasyon at resources. Kasama na rito ang case digests, summaries, jurisprudence, at mga batas.',
-                          color: Color.fromARGB(255, 201, 175, 6),
+                          color: const Color.fromARGB(255, 201, 175, 6),
                         ),
                       ],
                     ),
@@ -231,14 +345,6 @@ class _HomeState extends State<Home> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              // Text(
-                              //   'Tingnan lahat',
-                              //   style: TextStyle(
-                              //     color: Color(0xFF407CE2),
-                              //     fontSize: 12,
-                              //     fontWeight: FontWeight.bold,
-                              //   ),
-                              // ),
                             ],
                           ),
                         ),

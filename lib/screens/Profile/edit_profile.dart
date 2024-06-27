@@ -49,8 +49,11 @@ class _EditProfileState extends State<EditProfile> {
           _displayNameController.text = data['display_name'] ?? '';
           _middleNameController.text = data['middle_name'] ?? '';
           _lastNameController.text = data['last_name'] ?? '';
-          _selectedDate = (data['dob'] as Timestamp).toDate();
-          _dobController.text = DateFormat('yyyy-MM-dd').format(_selectedDate);
+          if (data['dob'] != null) {
+            _selectedDate = (data['dob'] as Timestamp).toDate();
+            _dobController.text =
+                DateFormat('yyyy-MM-dd').format(_selectedDate);
+          }
           _selectedCity = data['city'] ?? 'Angat';
           _phoneController.text = data['phone'] ?? '';
           _selectedGender = data['gender'] ?? 'Male';
@@ -352,10 +355,15 @@ class _EditProfileState extends State<EditProfile> {
   Future<void> _saveProfile() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance
+      final userData = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
-          .update({
+          .get();
+      final data = userData.data();
+
+      if (data == null) return;
+
+      Map<String, dynamic> updatedData = {
         'display_name': _displayNameController.text,
         'middle_name': _middleNameController.text,
         'last_name': _lastNameController.text,
@@ -366,11 +374,57 @@ class _EditProfileState extends State<EditProfile> {
         'spouseOccupation': _spouseOccupationController.text,
         'city': _selectedCity,
         'photo_url': _photoUrl,
+      };
+
+      // Detect changes and map to user-friendly labels
+      Map<String, String> fieldLabels = {
+        'display_name': 'First Name',
+        'middle_name': 'Middle Name',
+        'last_name': 'Last Name',
+        'dob': 'Date of Birth',
+        'phone': 'Phone Number',
+        'gender': 'Gender',
+        'spouse': 'Spouse Name',
+        'spouseOccupation': 'Spouse\'s Occupation',
+        'city': 'City',
+        'photo_url': 'Profile Picture',
+      };
+
+      List<String> changes = [];
+      updatedData.forEach((key, value) {
+        if (data[key] != value) {
+          changes.add(fieldLabels[key] ?? key);
+        }
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update(updatedData);
+
+      await _sendNotification(user.uid, changes);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile updated successfully')),
       );
     }
+  }
+
+  Future<void> _sendNotification(String uid, List<String> changes) async {
+    final notificationDoc =
+        FirebaseFirestore.instance.collection('notifications').doc();
+
+    String changeMessage =
+        'Your profile has been updated successfully. Changes: ${changes.join(', ')}.';
+
+    await notificationDoc.set({
+      'notifId': notificationDoc.id,
+      'uid': uid,
+      'message': changeMessage,
+      'type': 'profile_update',
+      'read': false,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 
   @override

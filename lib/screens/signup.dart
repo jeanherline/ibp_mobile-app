@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:ui' as ui;
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -24,6 +27,35 @@ class _SignUpState extends State<SignUp> {
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
 
+  Future<String> _generateQrCodeImageUrl(String uid) async {
+    final qrValidationResult = QrValidator.validate(
+      data: uid,
+      version: QrVersions.auto,
+      errorCorrectionLevel: QrErrorCorrectLevel.L,
+    );
+    if (qrValidationResult.status == QrValidationStatus.valid) {
+      final qrCode = qrValidationResult.qrCode!;
+      final painter = QrPainter.withQr(
+        qr: qrCode,
+        // ignore: deprecated_member_use
+        color: const Color(0xFF000000), // QR color
+        // ignore: deprecated_member_use
+        emptyColor: Colors.white, // Background color
+        gapless: false,
+      );
+      final image = await painter.toImage(200);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final buffer = byteData!.buffer.asUint8List();
+      final fileName = 'user_qr_code_$uid.png';
+      final storageRef = FirebaseStorage.instance.ref().child('user_qr_codes');
+      final uploadTask = storageRef.child(fileName).putData(buffer);
+      final snapshot = await uploadTask;
+      return await snapshot.ref.getDownloadURL();
+    } else {
+      throw Exception('Failed to generate QR code');
+    }
+  }
+
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       if (_agreedToTerms) {
@@ -40,6 +72,9 @@ class _SignUpState extends State<SignUp> {
 
           User? user = userCredential.user;
           if (user != null) {
+            // Generate QR code URL
+            String qrCodeUrl = await _generateQrCodeImageUrl(user.uid);
+
             // Save user information to Firestore
             await FirebaseFirestore.instance
                 .collection('users')
@@ -55,6 +90,7 @@ class _SignUpState extends State<SignUp> {
               'user_status':
                   'inactive', // User status is set to pending initially
               'created_time': DateTime.now(),
+              'userQrCode': qrCodeUrl,
             });
 
             // Send verification email

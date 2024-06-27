@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:ibp_app_ver2/screens/Appointments/appointmentDetails.dart';
+import 'package:ibp_app_ver2/screens/Notifications/notifications.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:ibp_app_ver2/screens/Konsulta/form_state_provider.dart';
@@ -16,7 +18,6 @@ import 'package:ibp_app_ver2/screens/Profile/profile.dart';
 import 'package:ibp_app_ver2/screens/Profile/edit_profile.dart';
 import 'package:ibp_app_ver2/screens/signup.dart';
 import 'package:ibp_app_ver2/screens/splash_screen.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +61,10 @@ class MyApp extends StatelessWidget {
             const DSWDCertificateOfIndigency(),
         '/pao_disqualification_letter': (context) =>
             const PAODisqualificationLetter(),
+        '/notifications': (context) => Notifications(),
+        '/appointmentDetails': (context) => const AppointmentDetails(
+              controlNumber: '',
+            ),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/konsulta_submit') {
