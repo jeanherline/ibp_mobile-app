@@ -1,13 +1,13 @@
 buildscript {
-     ext.kotlin_version = '1.8.22' // Update this line to the needed version
+    ext.kotlin_version = '1.8.22' // Specify the Kotlin version
     repositories {
         google()  // Make sure this line is included
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0' // Ensure this matches your Gradle plugin version
-        classpath 'com.google.gms:google-services:4.4.1' // This is the dependency that's failing to resolve
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:7.0.0' // Update to a newer version of the Gradle plugin
+        classpath 'com.google.gms:google-services:4.4.1' // Update to the latest Google Services plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Kotlin Gradle Plugin
     }
 }
 

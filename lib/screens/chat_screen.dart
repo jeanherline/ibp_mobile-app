@@ -127,29 +127,39 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+  title: Row(
+    children: [
+      CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://via.placeholder.com/150', // Placeholder for user's profile image
+        ),
+      ),
+      SizedBox(width: 10),
+      Expanded(  // Ensures the column takes up available space in the AppBar
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150'), // Placeholder for user's profile image
+            Text(
+              '${widget.displayName} ${widget.middleName} ${widget.lastName}',
+              overflow: TextOverflow.ellipsis,  // Add ellipsis if text is too long
+              softWrap: false, // Prevent automatic wrapping
+              style: TextStyle(fontSize: 16), // Optional: Adjust font size for better fit
             ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    '${widget.displayName} ${widget.middleName} ${widget.lastName}'),
-                Text('Online',
-                    style: TextStyle(fontSize: 12, color: Colors.green)),
-              ],
+            Text(
+              'Online',
+              style: TextStyle(fontSize: 12, color: Colors.green),
             ),
           ],
         ),
-        actions: [
-          IconButton(icon: Icon(Icons.video_call), onPressed: () {}),
-          IconButton(icon: Icon(Icons.call), onPressed: () {}),
-        ],
       ),
+    ],
+  ),
+  // actions: [
+  //   IconButton(icon: Icon(Icons.video_call), onPressed: () {}),
+  //   IconButton(icon: Icon(Icons.call), onPressed: () {}),
+  // ],
+),
+
       body: Column(
         children: [
           Expanded(

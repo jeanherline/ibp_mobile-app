@@ -166,7 +166,8 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
-        backgroundColor: Colors.blueAccent,
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 72, 0, 49),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

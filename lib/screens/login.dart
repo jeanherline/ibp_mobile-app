@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart'; // Import Google Sign-In package
 import 'package:ibp_app_ver2/screens/home.dart';
 import 'package:ibp_app_ver2/screens/signup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,6 +49,7 @@ class _LoginState extends State<Login> {
     setState(() {
       _isLoading = true;
     });
+
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -121,6 +123,97 @@ class _LoginState extends State<Login> {
       });
     }
   }
+
+Future<void> _signInWithGoogle() async {
+  try {
+    // Create a GoogleSignIn instance with scopes
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      scopes: ['email', 'https://www.googleapis.com/auth/userinfo.profile'],
+    );
+
+    // Trigger the Google Authentication flow
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    print('Google Authentication: ${googleAuth?.accessToken}, ${googleAuth?.idToken}');
+
+    if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
+      // Create a credential from the access token and idToken
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken, // Use ?. for nullable properties
+        idToken: googleAuth?.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Optionally, check user status and navigate to home
+      User? user = userCredential.user;
+      if (user != null) {
+        // Update user status to active in Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'user_status': 'active'});
+
+        bool isActive = await checkUserStatus(user.uid);
+
+        if (isActive) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Home()),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Sign In Failed'),
+              content: const Text('Your account is not active.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    } else {
+      print('Google login failed: No access token or ID token');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Sign In Failed'),
+          content: const Text('No access token or ID token was provided.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  } catch (e) {
+    print('Error signing in with Google: $e');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign In Failed'),
+        content: Text('An error occurred while signing in: $e'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -239,29 +332,9 @@ class _LoginState extends State<Login> {
                     borderRadius: BorderRadius.circular(10), // Rounded corners
                   ),
                 ),
-                onPressed: () {
-                  // TODO: Implement Google sign-in logic
-                },
+                onPressed: _signInWithGoogle, // Call the Google sign-in method
                 child: const Text(
                   'Mag-sign in gamit ang Google',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-              const SizedBox(height: 16), // Space between buttons
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[800], // Background color
-                  minimumSize: const Size(double.infinity, 55),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                  ),
-                ),
-                onPressed: () {
-                  // TODO: Implement Facebook sign-in logic
-                },
-                child: const Text(
-                  'Mag-sign in gamit ang Facebook',
                   style: TextStyle(fontSize: 18), // Set the font size here
                 ),
               ),
@@ -281,24 +354,21 @@ class OrDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: <Widget>[
+      children: const [
         Expanded(
           child: Divider(
-            color: Colors.grey[400],
-            height: 20,
+            thickness: 1,
+            color: Colors.grey,
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            'OR',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text('OR'),
         ),
         Expanded(
           child: Divider(
-            color: Colors.grey[400],
-            height: 20,
+            thickness: 1,
+            color: Colors.grey,
           ),
         ),
       ],

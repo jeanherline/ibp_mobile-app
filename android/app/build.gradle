@@ -1,8 +1,7 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id "dev.flutter.flutter-gradle-plugin"
+    id "dev.flutter.flutter-gradle-plugin" // Flutter Gradle Plugin
 }
 
 def localProperties = new Properties()
@@ -34,10 +33,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.ibp_app_ver2_ver2"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        applicationId = "com.mycompany.lawyer"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
@@ -46,10 +42,12 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.debug // Use debug signing for now
         }
+    }
+
+     tasks.withType(JavaCompile) {
+        options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
     }
 }
 
@@ -57,4 +55,22 @@ flutter {
     source = "../.."
 }
 
+dependencies {
+    // Use the Firebase BOM to ensure versions are compatible across Firebase libraries
+    implementation platform('com.google.firebase:firebase-bom:32.0.0') // Replace with the latest Firebase BOM version
 
+    // Firebase Authentication library
+    implementation 'com.google.firebase:firebase-auth' // Version is managed by the BOM
+
+    // Google Sign-In library
+    implementation 'com.google.android.gms:play-services-auth:20.6.0' // Replace with the latest version if necessary
+
+    // Add other dependencies here (example)
+    implementation 'com.google.firebase:firebase-firestore' // Firestore if used in your app
+
+    // Any other dependencies you need
+}
+
+
+// Add Google Services Plugin at the bottom
+apply plugin: 'com.google.gms.google-services' // Add this line

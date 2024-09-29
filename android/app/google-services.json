@@ -12,7 +12,20 @@
           "package_name": "com.mycompany.lawyer"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "610288789461-3v6hfmac5tcm1kjnei80ac9frg4ick68.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mycompany.lawyer",
+            "certificate_hash": "de7888dcd0a106c2838b483111fe24e777bc713a"
+          }
+        },
+        {
+          "client_id": "610288789461-pqa7pcoqt93ut18cclg3dljtald9qjqt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA3nECwjQ9JAuBv9g1PsHWnvXwkV59kMpk"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "610288789461-o8su9fftl0i3rumk415e3mnvkae20jn2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "610288789461-6gbnvrkhib0jb0tr4lus2hfutvutb48p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.legalaid"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +56,20 @@
           "package_name": "com.mycompany.legalaid"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "610288789461-6a02g4v8hd2l65le0njhr73ju9p89sqi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mycompany.legalaid",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "610288789461-pqa7pcoqt93ut18cclg3dljtald9qjqt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA3nECwjQ9JAuBv9g1PsHWnvXwkV59kMpk"
@@ -39,7 +77,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "610288789461-o8su9fftl0i3rumk415e3mnvkae20jn2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "610288789461-6gbnvrkhib0jb0tr4lus2hfutvutb48p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.legalaid"
+              }
+            }
+          ]
         }
       }
     }
